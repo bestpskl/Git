@@ -1,0 +1,218 @@
+Git By Pasakorn Limchuchua
+
+Extensions Recommend : Git Graph (Command + Shift + P -> Git Graph), GitLens
+
+/* ---------------------------------*/
+/* ----- Git : Version Control -----*/
+/* ---------------------------------*/
+
+Install git (macOS is aleardy installed)
+
+Setup git
+> git config --global user.name "firstname lastname"
+> git config --global user.email "email@example.com"
+
+Check setting
+> git config user.name
+> git config user.email
+> git config --global -l                                     : check all config
+
+Set up SSH Key and add to git hosting
+> watch : https://www.youtube.com/watch?v=nZYJKXXMvkM&ab_channel=TechPedia-HowtoTech
+
+Overview
+
+                                          pull
+         -----------------------------------------------------------------------------
+         |                                                 |                         |
+         v                                                 v          push           |
+|-------------|  add   |----------------|  commit   |--------------| ------> |---------------|
+|  Workspace  | -----> |  Staging Area  | --------> |  Local Repo  |         |  Remote Repo  |
+|-------------|        |----------------|           |--------------| <------ |---------------|
+         ^                                                            fetch          |
+         |                                                                           | 
+         -----------------------------------------------------------------------------
+                                          clone
+
+/////////////////////////////////////
+/////////////   Local   /////////////
+/////////////////////////////////////
+
+* Staging Area *
+
+        change                      add             commit
+clean ---------> dirty (unstage) ---------> stage ---------> clean
+
+Type of change 
+A : Add new file
+M : Modify exising file
+R : Rename / Move exising file
+D : Delete exising file
+U : Unstaged files
+
+Type of commit reference - 1. commit id / 2. head / 3. tag / 4. branch
+
+> git init                                                  : create new local repository
+> git status                                                : check status of current workspace / staging area
+
+----- stage files -----
+
+> git add (file_name)                                       : add file 
+> git add (file_name) (file_name) ...                       : add multiple files 
+> git add .                                                 : add all files 
+
+> git rm (file_name)                                        : remove file
+> git mv (file_name) (new_file_name)                        : rename / move file
+
+----- unstage files -----
+
+> git reset (file_name)                                     : unstage file
+> git restore --staged (file_name)                          : unstage file
+
+----- commit changes -----
+
+> git commit                                                : commit changes to repository (open file to write)
+> git commit -m "(message)"                                 : commit changes with short cut for messaging
+
+----- uncommit changes -----
+
+case 1 : rollback one commit
+
+> git reset HEAD^                                           : uncommit + leave unstaged file (must git add . firstly)
+> git reset --soft HEAD^                                    : uncommit + leave staged file
+> git reset --hard HEAD^                                    : uncommit + throw everything
+
+case 2 : rollback to specific commit 
+
+> git reset (commit_id)                                     : uncommit + leave unstaged file (must git add . firstly)
+> git reset (commit_id)                                     : uncommit + leave staged file
+> git reset (commit_id)                                     : uncommit + throw everything
+
+----- stash changes -----
+
+> git stash                                                 : stash changes
+> git stash --include-untracked                             : stash changes including untracked files
+> git stash list                                            : list stashes in stack
+
+> git stash pop                                             : apply latest stash to working directory
+
+----- view history -----
+
+> git log                                                   : view git commit history
+> git log --oneline                                         : view git commit history (short version)
+> git log --(file_name)                                     : view all commits of that file
+
+> git checkout (commit_reference)                           : change current commit to selected commit 
+
+----- restore file -----
+
+> git restore (file_name)                                   : discard changes in that file
+> git restore --source=(commit_reference) (file_name)       : restore file from specific commit to current workspace
+
+----- revert changes -----
+
+case 1 : revert all changes
+
+> git revert (commit_id)                                    : commit with opposite changes of that commit
+s
+case 2 : revert specific file
+
+> git revert (commit_id) --no-commit                        : stage all opposite changes of that commit
+      - git restore --staged (file_name)                    : remove unwanted changes in opposite changes to unstage file                
+      - git restore (file_name)                             : discard changes in that file
+      - git commit -m "(revert message)"                    : continuously commit 
+
+----- cherry-pick change -----
+
+> git cherry-pick (commit_id)                               : apply changes from arbitrary commit to current commit
+
+//////////////////////////////////////
+/////////////   Remote   /////////////
+//////////////////////////////////////
+
+> git status                                                : check current of branch
+
+----- create branch -----
+
+> git branch (branch_name)                                  : create new branch at current commit
+> git checkout (branch_name)                                : switch to new branch 
+
+> git checkout -b (branch_name)                             : create new branch at current commit then switch to it
+> git branch -m (branch_name) (new_branch_name)             : rename branch
+
+> git branch                                                : list local branches
+> git branch -a                                             : list both local and repo branches
+
+----- delete branch (local) -----
+
+> git branch -d (branch_name)                               : branch is merged ? delete branch : not delete branch (merge firstly)
+> git branch -D (branch_name)                               : forcibly delete branch 
+
+----- merge branch (local) -----
+
+> git merge (incomming_branch_name)                         : merge current branch with changes from incomming branch as new commit
+      - solve merge conflict by text editor                 : accept current change / accept incomming change / accept both changes / compare changes
+      - git add . -> git commit -m "(message)"              : continuously merge after solving conflict
+     or git add . -> git merge --continue
+> git merge --abort                                         : unmerge branch when conflict
+
+----- local to repo -----
+
+> git remote add (remote_name [origin]) (URL)               : add remote repo to local repo (must be same name)
+> git remote                                                : check remote name
+> git remote get-url (remote_name [origin])                 : check url name
+> git remote set_url (remote_name [origin]) (URL)           : change remote repo
+
+case 1 : not setup upstream
+
+> git push (remote_name) (branch_name)                      : upload changes of local branch to remote branch
+
+case 2 : setup upstream
+
+> git push -u (remote_name) (branch_name)                   : set upstream to automatically link local branch with repo branch and upload changes of local branch to remote branch
+> git push                                                  : upload changes of local branch to remote branch (next time)
+> git push --all                                            : upload changes of all local branches to all remote branches (next time)
+
+Note  : must fetch & pull to current local branch before push everytime
+
+----- repo to local -----
+
+case 1 : setup local branch already
+
+> git fetch                                                 : download all commits in all repo branches to all local branches but not update any of them
+> git pull                                                  : download all commits in all repo branches to all local branches and update only current local branch by merging with remote branch
+      
+Note  : git fetch & git pull must setup unpstream firstly
+      : git pull = git fetch + git merge
+
+case 2 : not setup local branch already (first time)
+
+> git clone (URL)                                           : download all commits in all repo branches to all local branches 
+
+Note  : after clone remote repo to local and want to setup local branch that has upstream with remote branch in remote repo
+      - git branch -a 
+      - git checkout (branch_name_with_same_name_of_remote_branch_name)
+      - git add . 
+      - git commit -m "(message)" 
+      - git push
+
+----- delete branch (remote) -----
+
+> git push origin --delete (remote_branch_name)             : delete remote branch 
+
+----- tag commit -----
+
+> git tag (v.x.y.z) -m "(tag_message)                       : add tag version to commit with message
+> git tag -n99                                              : list all tags with message
+> git tag --delete (v.x.y.z)                                : delete tag version
+
+> git push origin (v.x.y.z)                                 : push tag to remote repo
+> git push origin --tags                                    : push all tags to remote repo
+> git push --delete origin (v.x.y.z)                        : delete tag in remote repo
+
+Note  : v.x.y.z = (version).(major_version).(minor_version).(patch_version)
+
+----- merge branch (repo) / create merge request -----
+
+Note  : must push changes before creating new merge request in git hosting then solve merge conflict
+      : can push changes many times if merge request is not merge
